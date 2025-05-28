@@ -52,7 +52,7 @@ const CourseDetails = () => {
             const count = GetAvgRating(courseDetail?.ratingAndReviews);
             setAvgReviewCount(count);
             console.log("getCourseDetails -> count", parseInt(count));
-            }
+            }-
     }, [courseDetail?.ratingAndReviews]);
 
 

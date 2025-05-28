@@ -182,8 +182,6 @@ const NavBar = ({ setProgress }) => {
                     </div>
                 </div>
 
-
-
                 {/* Desktop Navbar */}
                 <nav>
                     <ul className=' flex-row gap-x-6 text-richblack-25 gap-5 hidden md:flex'>
@@ -209,10 +207,6 @@ const NavBar = ({ setProgress }) => {
                                                     )
 
                                                 }
-
-
-
-
 
 
                                             </div>

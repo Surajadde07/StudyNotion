@@ -50,7 +50,7 @@ exports.categoryPageDetails = async (req, res) => {
 
 		// Get courses for the specified category
 		const selectedCategory = await Category.findById(categoryId)          //populate instuctor and rating and reviews from courses
-			.populate({path:"courses",match:{status:"Published"},populate:([{path:"instructor"},{path:"ratingAndReviews"}])})
+			.populate({ path: "courses", match: { status: "Published" }, populate: ([{ path: "instructor" }, { path: "ratingAndReviews" }]) })
 			.exec();
 		// console.log(selectedCategory);
 		// Handle the case when the category is not found
@@ -74,14 +74,14 @@ exports.categoryPageDetails = async (req, res) => {
 		// Get courses for other categories
 		const categoriesExceptSelected = await Category.find({
 			_id: { $ne: categoryId },
-		}).populate({path:"courses",match:{status:"Published"},populate:([{path:"instructor"},{path:"ratingAndReviews"}])});
+		}).populate({ path: "courses", match: { status: "Published" }, populate: ([{ path: "instructor" }, { path: "ratingAndReviews" }]) });
 		let differentCourses = [];
 		for (const category of categoriesExceptSelected) {
 			differentCourses.push(...category.courses);
 		}
 
 		// Get top-selling courses across all categories
-		const allCategories = await Category.find().populate({path:"courses",match:{status:"Published"},populate:([{path:"instructor"},{path:"ratingAndReviews"}])});
+		const allCategories = await Category.find().populate({ path: "courses", match: { status: "Published" }, populate: ([{ path: "instructor" }, { path: "ratingAndReviews" }]) });
 		const allCourses = allCategories.flatMap((category) => category.courses);
 		const mostSellingCourses = allCourses
 			.sort((a, b) => b.sold - a.sold)
@@ -121,7 +121,7 @@ exports.addCourseToCategory = async (req, res) => {
 				message: "Course not found",
 			});
 		}
-		if(category.courses.includes(courseId)){
+		if (category.courses.includes(courseId)) {
 			return res.status(200).json({
 				success: true,
 				message: "Course already exists in the category",
