@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 
 const app = express();
@@ -14,22 +15,30 @@ const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const { cloudnairyconnect } = require("./config/cloudinary");
 
-const dotenv = require("dotenv");
-dotenv.config();
-
 const PORT = process.env.PORT || 5000;
 database.connect();
 
 app.use(express.json());
 app.use(cookieParser());
 
-const whitelist = process.env.CORS_ORIGIN
-  ? JSON.parse(process.env.CORS_ORIGIN)
-  : ["*"];
+let whitelist = ["http://localhost:3000"];
+if (process.env.CORS_ORIGIN) {
+  try {
+    whitelist = JSON.parse(process.env.CORS_ORIGIN);
+  } catch (e) {
+    whitelist = process.env.CORS_ORIGIN.split(",").map((s) => s.trim());
+  }
+}
 
 app.use(
   cors({
-    origin: whitelist,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (whitelist.includes("*") || whitelist.includes(origin) || origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     maxAge: 14400,
   })
