@@ -1,3 +1,9 @@
+// Polyfill SlowBuffer for Node 22+ compatibility with legacy dependencies
+const buffer = require("buffer");
+if (!buffer.SlowBuffer) {
+  buffer.SlowBuffer = buffer.Buffer;
+}
+
 require("dotenv").config();
 const express = require("express");
 
