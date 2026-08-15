@@ -72,6 +72,7 @@ exports.capturePayment = async (req, res) => {
                 orderId: paymentResponse.id,
                 currency:paymentResponse.currency,
                 amount:paymentResponse.amount,
+                key: process.env.RAZORPAY_KEY,
             });
         }
         catch(error) {
@@ -153,11 +154,15 @@ exports.verifySignature = async (req, res) => {
                         const userEmail = recipient.email;
                         const userName = recipient.firstName + " " + recipient.lastName;
                         const emailTemplate = courseEnrollmentEmail(courseName,userName, courseDescription, thumbnail);
-                        await mailSender(
-                            userEmail,
-                            `You have successfully enrolled for ${courseName}`,
-                            emailTemplate,
-                        );
+                        try {
+                            await mailSender(
+                                userEmail,
+                                `You have successfully enrolled for ${courseName}`,
+                                emailTemplate,
+                            );
+                        } catch (mailErr) {
+                            console.log("Could not send enrollment email:", mailErr.message);
+                        }
                         }
                         return res.status(200).json({
                             success:true,
@@ -209,12 +214,20 @@ exports.sendPaymentSuccessEmail = async (req, res) => {
     }
     try{
         const enrolledStudent =  await User.findById(userId);
-        await mailSender(
-            enrolledStudent.email,
-            `Study Notion Payment successful`,
-            paymentSuccess(amount/100, paymentId, orderId, enrolledStudent.firstName, enrolledStudent.lastName),
-        );
-}
+        try {
+            await mailSender(
+                enrolledStudent.email,
+                `Study Notion Payment successful`,
+                paymentSuccess(amount/100, paymentId, orderId, enrolledStudent.firstName, enrolledStudent.lastName),
+            );
+        } catch (mailErr) {
+            console.log("Could not send payment success email:", mailErr.message);
+        }
+        return res.status(200).json({
+            success: true,
+            message: 'Payment success email sent'
+        });
+    }
     catch(error) {
         console.error(error);
         return res.status(500).json({
