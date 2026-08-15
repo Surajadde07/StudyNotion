@@ -22,7 +22,6 @@ const fileUpload = require("express-fileupload");
 const { cloudnairyconnect } = require("./config/cloudinary");
 
 const PORT = process.env.PORT || 5000;
-database.connect();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -60,13 +59,9 @@ app.use(
 cloudnairyconnect();
 
 app.use("/api/v1/auth", userRoutes);
-
 app.use("/api/v1/payment", paymentRoutes);
-
 app.use("/api/v1/profile", profileRoutes);
-
 app.use("/api/v1/course", CourseRoutes);
-
 app.use("/api/v1/contact", require("./routes/ContactUs"));
 
 app.get("/", (req, res) => {
@@ -75,6 +70,15 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Start server ONLY after DB is fully connected — prevents cold-start 500 errors
+(async () => {
+  try {
+    await database.connect();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to connect to DB, server not started:", err);
+    process.exit(1);
+  }
+})();
