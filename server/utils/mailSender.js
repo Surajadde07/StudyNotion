@@ -4,13 +4,17 @@ require('dotenv').config()
 
 const mailSender = async (email, title, body) => {
     try{
+            const user = process.env.MAIL_USER ? process.env.MAIL_USER.trim().replace(/["']/g, '') : '';
+            const pass = process.env.MAIL_PASS ? process.env.MAIL_PASS.trim().replace(/["'\s]/g, '') : '';
+            const host = process.env.MAIL_HOST ? process.env.MAIL_HOST.trim().replace(/["']/g, '') : 'smtp.gmail.com';
+
             let transporter = nodemailer.createTransport({
-                host:process.env.MAIL_HOST,
+                host: host,
                 port: 587,
                 secure: false, // true for 465, false for other ports
                 auth:{
-                    user: process.env.MAIL_USER,
-                    pass: process.env.MAIL_PASS ? process.env.MAIL_PASS.replace(/\s+/g, '') : '',
+                    user: user,
+                    pass: pass,
                 },
                 tls: {
                     rejectUnauthorized: false // Allows self-signed certificates
@@ -19,7 +23,7 @@ const mailSender = async (email, title, body) => {
 
 
             let info = await transporter.sendMail({
-                from: `"Study Notion" <${process.env.MAIL_USER}>`,
+                from: `"Study Notion" <${user}>`,
                 to:`${email}`,
                 subject: `${title}`,
                 html: `${body}`,
